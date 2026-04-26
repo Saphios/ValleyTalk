@@ -146,17 +146,20 @@ public class DialogueContext
         {
             elements = elements.Skip(1).ToArray();
         }
+        if (elements.Length == 0) return;
         // If the first element in an M then set the context to married, and remove it from the list
         if (elements[0] == "M")
         {
             Married = true;
             elements = elements.Skip(1).ToArray();
         }
+        if (elements.Length == 0) return;
         if (elements[0] == "B")
         {
             Birthday = true;
             elements = elements.Skip(1).ToArray();
         }
+        if (elements.Length == 0) return;
         // Check if the first element is a season.  If so, set the season and remove it from the list
         if (!int.TryParse(elements[0], out _) && Enum.TryParse<Season>(elements[0], true, out Season season))
         {
@@ -165,7 +168,7 @@ public class DialogueContext
         }
         if (elements.Length == 0) return;
         // Check if the first element is a valid GUID. If so, set the chat ID and remove it from the list
-        if (Guid.TryParse(elements[0], out _))
+        if (Guid.TryParse(elements[0], out _) && elements.Length >= 2)
         {
             ChatID = $"{elements[0]}_{elements[1]}";
             elements = elements.Skip(2).ToArray();
@@ -217,7 +220,7 @@ public class DialogueContext
             DayOfSeason = dayOfSeason;
             elements = elements.Skip(1).ToArray();
         }
-        else if (elements[0].StartsWith("Accept", StringComparison.OrdinalIgnoreCase))
+        else if (elements[0].StartsWith("Accept", StringComparison.OrdinalIgnoreCase) && elements.Length >= 2)
         {
             // If element 1 starts with (O) then remove it
             var gift = elements[1];
