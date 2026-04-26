@@ -30,6 +30,11 @@ internal abstract class LlmOpenAiBase : Llm
         bool isOpenRouter = !string.IsNullOrEmpty(url) && url.Contains("openrouter.ai", StringComparison.OrdinalIgnoreCase);
         bool isDeepseekModel = !string.IsNullOrEmpty(modelName) && modelName.StartsWith("deepseek/", StringComparison.OrdinalIgnoreCase);
 
+        // For ValleyTalk we want one short line of dialogue. Reasoning models burn their
+        // entire output budget on chain-of-thought and return content=null. Disable reasoning
+        // unconditionally — non-reasoning models ignore the field.
+        var reasoning = new { exclude = true };
+
         object payload;
         if (isOpenRouter && isDeepseekModel)
         {
@@ -46,7 +51,22 @@ internal abstract class LlmOpenAiBase : Llm
                 {
                     order = new[] { "DeepSeek" },
                     allow_fallbacks = true
-                }
+                },
+                reasoning = reasoning
+            };
+        }
+        else if (isOpenRouter)
+        {
+            payload = new
+            {
+                model = modelName,
+                max_tokens = n_predict,
+                messages = new PromptElement[]
+                {
+                    new() { role = "system", content = systemPromptString },
+                    new() { role = "user", content = gameCacheString + npcCacheString + promptString }
+                },
+                reasoning = reasoning
             };
         }
         else
