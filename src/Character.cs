@@ -659,7 +659,12 @@ public class Character
     internal IEnumerable<Tuple<StardewTime, IHistory>> EventHistorySample()
     {
 
-        var allPreviousActivities = Game1.getPlayerOrEventFarmer().previousActiveDialogueEvents.First();
+        var farmer = Game1.getPlayerOrEventFarmer();
+        if (farmer?.previousActiveDialogueEvents == null || !farmer.previousActiveDialogueEvents.Any())
+        {
+            return Array.Empty<Tuple<StardewTime, IHistory>>();
+        }
+        var allPreviousActivities = farmer.previousActiveDialogueEvents.First();
         var previousActivites = allPreviousActivities.Where(x => HistoryEvents.ContainsKey(x.Key) && (x.Value < 112 || x.Value % 112 == 0)).ToList();
 
         var fullHistory = EventHistory.Concat(previousActivites.Select(x => MakeActivityHistory(x)));

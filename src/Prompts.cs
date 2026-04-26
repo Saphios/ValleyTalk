@@ -197,6 +197,7 @@ public class Prompts
         DefaultOrOverride("Weather", GetWeather, prompt);
         DefaultOrOverride("OtherNpcs", GetOtherNpcs, prompt);
         Game1.getPlayerOrEventFarmer().friendshipData.TryGetValue(Character.Name, out Friendship friendship);
+        if (friendship == null) { friendship = new Friendship(); }
         if (friendship.IsMarried() || friendship.IsRoommate())
         {
             if (friendship.IsRoommate())
@@ -241,7 +242,8 @@ public class Prompts
     {
         if (Game1.random.NextDouble() < 0.5 || Context.ChatHistory.Any() ) return;
 
-        var nPreoccupations = Character.PossiblePreoccupations.Count;
+        var nPreoccupations = Character.PossiblePreoccupations?.Count ?? 0;
+        if (nPreoccupations == 0) return;
         string preoccupation;
         if (Game1.Date == Character.PreoccupationDate)
         {
