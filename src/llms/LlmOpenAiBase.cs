@@ -25,24 +25,44 @@ internal abstract class LlmOpenAiBase : Llm
 
     internal override async Task<LlmResponse> RunInference(string systemPromptString, string gameCacheString, string npcCacheString, string promptString, string responseStart = "",int n_predict = 2048,string cacheContext="",bool allowRetry = true)
     {
-        var inputString = JsonConvert.SerializeObject(new // Changed
+        // When routing through OpenRouter, force the official provider for DeepSeek models so prompt caching works.
+        // Third-party DeepSeek hosts on OpenRouter (NovitaAI, DeepInfra, etc.) do not implement DeepSeek's prompt cache.
+        bool isOpenRouter = !string.IsNullOrEmpty(url) && url.Contains("openrouter.ai", StringComparison.OrdinalIgnoreCase);
+        bool isDeepseekModel = !string.IsNullOrEmpty(modelName) && modelName.StartsWith("deepseek/", StringComparison.OrdinalIgnoreCase);
+
+        object payload;
+        if (isOpenRouter && isDeepseekModel)
+        {
+            payload = new
             {
                 model = modelName,
                 max_tokens = n_predict,
                 messages = new PromptElement[]
-                { 
-                    new()
-                    {
-                        role = "system",
-                        content = systemPromptString
-                    },
-                    new()
-                    {
-                        role = "user",
-                        content = gameCacheString + npcCacheString + promptString
-                    }
+                {
+                    new() { role = "system", content = systemPromptString },
+                    new() { role = "user", content = gameCacheString + npcCacheString + promptString }
+                },
+                provider = new
+                {
+                    order = new[] { "DeepSeek" },
+                    allow_fallbacks = false
                 }
-            });
+            };
+        }
+        else
+        {
+            payload = new
+            {
+                model = modelName,
+                max_tokens = n_predict,
+                messages = new PromptElement[]
+                {
+                    new() { role = "system", content = systemPromptString },
+                    new() { role = "user", content = gameCacheString + npcCacheString + promptString }
+                }
+            };
+        }
+        var inputString = JsonConvert.SerializeObject(payload);
         var json = new StringContent(
             inputString,
             Encoding.UTF8,
