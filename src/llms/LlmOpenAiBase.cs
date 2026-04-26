@@ -45,7 +45,7 @@ internal abstract class LlmOpenAiBase : Llm
                 provider = new
                 {
                     order = new[] { "DeepSeek" },
-                    allow_fallbacks = false
+                    allow_fallbacks = true
                 }
             };
         }
