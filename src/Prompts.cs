@@ -320,8 +320,32 @@ public class Prompts
 
     private void GetSpouse(StringBuilder prompt)
     {
-        var spouses = Game1
-                    .getPlayerOrEventFarmer()
+        // Multiplayer awareness: in MP this NPC may be married to another farmer
+        // (not the local player). The local player's friendshipData does not
+        // record the other farmer's marriage, so we scan all farmers and
+        // describe the situation explicitly when relevant.
+        var localFarmer = Game1.getPlayerOrEventFarmer();
+        Farmer otherFarmerSpouse = null;
+        try
+        {
+            foreach (var f in Game1.getAllFarmers())
+            {
+                if (f == null || f == localFarmer) continue;
+                if (!string.IsNullOrEmpty(f.spouse) && f.spouse == Name)
+                {
+                    otherFarmerSpouse = f;
+                    break;
+                }
+            }
+        }
+        catch { /* getAllFarmers can throw early in load; ignore */ }
+
+        if (otherFarmerSpouse != null)
+        {
+            prompt.AppendLine($"Important relationship context: {Name} is married to a different farmer named {otherFarmerSpouse.Name}, not to the player you are speaking with. {Name}'s home and primary emotional life is centred on {otherFarmerSpouse.Name}. The player you are speaking with is a friend or co-worker on the same farm, not {Name}'s spouse, and {Name} should not flirt with or treat them as a romantic partner.");
+        }
+
+        var spouses = localFarmer
                     .friendshipData
                     .FieldDict
                     .Where(x => x.Value.Value.IsMarried() && !x.Value.Value.IsRoommate())
