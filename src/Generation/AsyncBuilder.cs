@@ -90,6 +90,13 @@ public class AsyncBuilder
 
             void UpdateUI()
             {
+                // If the user pressed Escape during generation, the thinking window is already gone
+                // and they have signalled they don't want this dialogue at all. Discard the result.
+                if (thinkingWindow != null && thinkingWindow.Cancelled)
+                {
+                    return;
+                }
+
                 // Hide thinking window
                 if (Game1.activeClickableMenu == thinkingWindow)
                 {

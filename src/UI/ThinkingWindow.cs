@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -13,6 +14,7 @@ namespace ValleyTalk
         private readonly string _message;
         private int _animationFrame;
         private float _animationTimer;
+        public bool Cancelled { get; private set; }
         
         // Margin dimensions
         private const int Margin = 24;
@@ -82,7 +84,17 @@ namespace ValleyTalk
 
         public override void receiveKeyPress(Microsoft.Xna.Framework.Input.Keys key)
         {
-            // Do nothing - this window should not be interactive
+            // Allow Escape to cancel the in-flight generation and close the window.
+            // Other keys are ignored so the user can't accidentally trigger anything.
+            if (key == Keys.Escape || key == Game1.options.menuButton[0].key)
+            {
+                Cancelled = true;
+                Game1.playSound("smallSelect");
+                if (Game1.activeClickableMenu == this)
+                {
+                    Game1.exitActiveMenu();
+                }
+            }
         }
 
         public override bool overrideSnappyMenuCursorMovementBan()
