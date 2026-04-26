@@ -106,7 +106,7 @@ public class AsyncBuilder
         }
         catch (Exception ex)
         {
-            ModEntry.SMonitor?.Log($"Error generating NPC response: {ex.Message}", StardewModdingAPI.LogLevel.Error);
+            ModEntry.SMonitor?.Log($"Error generating NPC response: {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}\nInner: {ex.InnerException}", StardewModdingAPI.LogLevel.Error);
 
             // Make sure to hide thinking window even if there's an error
             if (AndroidHelper.IsAndroid)
