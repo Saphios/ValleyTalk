@@ -112,6 +112,34 @@ internal abstract class LlmOpenAiBase : Llm
                     var text = contentToken.ToString();
                     if (!string.IsNullOrWhiteSpace(text))
                     {
+                        if (ModEntry.Config?.Debug == true)
+                        {
+                            try
+                            {
+                                var usageToken = responseJson["usage"];
+                                if (usageToken != null && usageToken.Type != JTokenType.Null)
+                                {
+                                    int promptTokens = usageToken.Value<int?>("prompt_tokens") ?? 0;
+                                    int completionTokens = usageToken.Value<int?>("completion_tokens") ?? 0;
+                                    int cachedTokens = 0;
+                                    var details = usageToken["prompt_tokens_details"];
+                                    if (details != null && details.Type != JTokenType.Null)
+                                    {
+                                        cachedTokens = details.Value<int?>("cached_tokens") ?? 0;
+                                    }
+                                    if (cachedTokens == 0)
+                                    {
+                                        cachedTokens = usageToken.Value<int?>("prompt_cache_hit_tokens") ?? 0;
+                                    }
+                                    int freshTokens = promptTokens - cachedTokens;
+                                    Log.Debug($"Model: {modelName}, Tokens: input={promptTokens} (cached={cachedTokens}, fresh={freshTokens}), output={completionTokens}");
+                                }
+                            }
+                            catch (Exception logEx)
+                            {
+                                Log.Debug($"Failed to parse usage info: {logEx.Message}");
+                            }
+                        }
                         return new LlmResponse(text);
                     }
                     else
