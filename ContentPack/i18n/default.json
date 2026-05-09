@@ -150,7 +150,7 @@
   "generalBeingRoommates": "being roommates",
   "generalTheMarriage": "the marriage",
   "marriageSentimentGood": "{{Name}} is feeling very positive about {{marriageOrRoommate}}.",
-  "marriageSentimentBad": "{{Name}} is feeling very negative about {{marriageOrRoommate}}. While {{Name}} should will still talk about the Context of the conversation, they will be more likely to be negative or critical.",
+  "marriageSentimentBad": "{{Name}} feels a quiet distance has grown in {{marriageOrRoommate}}. They may seem a little subdued, distracted, or wistful, but not openly hostile or mean. They still care about the farmer and want the relationship to work; they're just not at their best right now.",
   "marriageSentimentNeutral": "{{Name}} is generally content, but a little uncertain and conflicted about {{marriageOrRoommate}}.",
   "farmContentsPet": "The farm has a pet {{petType}} named {{Name}}.",
   "farmContentsNoPets": "The farm has no pets.",

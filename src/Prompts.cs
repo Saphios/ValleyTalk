@@ -695,7 +695,7 @@ public class Prompts
             case > 12:
                 prompt.AppendLine(Util.GetString(Character,"marriageSentimentGood", new { Name= Name, marriageOrRoommate= marriageOrRoommate }));
                 break;
-            case < 10:
+            case < 7:
                 prompt.AppendLine(Util.GetString(Character,"marriageSentimentBad", new { Name= Name, marriageOrRoommate= marriageOrRoommate }));
                 break;
             default:
